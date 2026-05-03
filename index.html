@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IKIY PRESTIGE - SUPREME INFINITY EDITION</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@300;500;800&family=Space+Mono&display=swap');
+
+        :root {
+            --gold-main: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --gold-solid: #bf953f;
+            --deep-black: #050505;
+            --glass-bg: rgba(0, 0, 0, 0.85);
+            --neon-gold: 0 0 15px rgba(191, 149, 63, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--deep-black); color: #fff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden; width: 100%;
+        }
+
+        /* Background Particle Canvas */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
+
+        .watermark {
+            position: fixed; top: 20px; width: 100%; text-align: center;
+            font-family: 'Cinzel', serif; background: var(--gold-main);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 0.75rem; letter-spacing: 15px; font-weight: 900; z-index: 1000;
+            text-shadow: var(--neon-gold);
+        }
+
+        .container { 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 100px 20px 50px; min-height: 100vh;
+        }
+
+        .panel {
+            width: 100%; max-width: 500px; background: var(--glass-bg);
+            border: 1px solid rgba(191, 149, 63, 0.3); border-radius: 45px;
+            padding: 40px 30px; backdrop-filter: blur(50px);
+            box-shadow: 0 40px 100px rgba(0,0,0,1);
+            position: relative; margin-bottom: 40px; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .note-prestige {
+            background: rgba(191, 149, 63, 0.05); border-left: 3px solid var(--gold-solid);
+            padding: 20px; border-radius: 15px; font-size: 0.7rem; color: #aaa;
+            line-height: 1.7; margin-bottom: 30px; text-align: left;
+        }
+
+        .title-gold {
+            font-family: 'Cinzel', serif; font-size: 1.5rem; background: var(--gold-main);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 30px; font-weight: 900; letter-spacing: 3px;
+        }
+
+        /* Interactive Menu Buttons */
+        .btn-prestige {
+            position: relative; width: 100%; padding: 25px; margin-bottom: 18px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(191, 149, 63, 0.2);
+            border-radius: 25px; color: #ffd700; font-weight: 800; font-size: 0.8rem;
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+            overflow: hidden; transition: 0.3s;
+        }
+
+        .btn-prestige::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-prestige:hover::before { left: 100%; }
+        .btn-prestige:active { transform: scale(0.96); background: var(--gold-main); color: #000; }
+
+        /* Words Display Area */
+        .word-box { 
+            min-height: 320px; display: flex; flex-wrap: wrap; 
+            justify-content: center; align-content: center; gap: 12px; margin-bottom: 25px;
+        }
+        .word-unit {
+            opacity: 0; filter: blur(12px); transform: translateY(20px);
+            font-size: 1.3rem; font-weight: 800; animation: revealWord 0.7s forwards;
+        }
+        @keyframes revealWord { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+
+        /* Solution Styling */
+        .sol-scroll { height: 450px; overflow-y: auto; padding-right: 15px; scrollbar-width: none; }
+        .sol-scroll::-webkit-scrollbar { display: none; }
+        .card-sol {
+            background: rgba(191, 149, 63, 0.03); border: 1px solid rgba(191, 149, 63, 0.15);
+            padding: 25px; border-radius: 30px; margin-bottom: 20px; text-align: left;
+        }
+
+        /* Buang Sial Interactive Area */
+        .sial-zone { position: relative; margin-top: 20px; }
+        .sial-input {
+            width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--gold-solid);
+            color: #fff; padding: 20px; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none;
+        }
+        #sial-ghost { 
+            font-size: 1.8rem; font-weight: 900; min-height: 60px; margin: 30px 0; 
+            color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); 
+        }
+
+        /* Game Section */
+        .game-panel {
+            width: 100%; max-width: 500px; border: 2px solid #bf953f; 
+            border-radius: 40px; overflow: hidden; background: #000; position: relative;
+        }
+        canvas#zen-canvas { display: block; width: 100%; height: 300px; cursor: pointer; }
+
+        .hidden { display: none !important; }
+        .action-btn {
+            background: var(--gold-main); color: #000; border: none; 
+            padding: 20px 60px; border-radius: 50px; font-family: 'Cinzel', serif;
+            font-weight: 900; cursor: pointer; box-shadow: var(--neon-gold);
+            letter-spacing: 2px; margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">IKIY GASIMA INFINITY</div>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        
+        <div class="panel" id="ui-panel">
+            
+            <div id="view-home">
+                <div class="note-prestige">
+                    <strong>SUPREME NOTE:</strong><br>
+                    Selamat datang di Sanctuary pribadi lu. Di sini, setiap kata adalah energi, dan setiap interaksi adalah pembersihan. Biarkan kemewahan ini menenangkan pikiran lu yang lelah.
+                </div>
+                <h1 class="title-gold">SELECT PATHWAY</h1>
+                <button class="btn-prestige" onclick="launch('kerja')">KERJAAN / KARIR</button>
+                <button class="btn-prestige" onclick="launch('sekolah')">TUGAS SEKOLAH</button>
+                <button class="btn-prestige" onclick="launch('mental')">LELAH MENTAL</button>
+                <button class="btn-prestige" style="border-color:#fff; color:#fff;" onclick="nav('view-sial')">FITUR BUANG SIAL</button>
+            </div>
+
+            <div id="view-words" class="hidden">
+                <div style="font-size:0.6rem; color:var(--gold-solid); letter-spacing:4px; margin-bottom:20px; font-weight:800;">RESONATING ENERGY...</div>
+                <div class="word-box" id="word-target"></div>
+                <button class="action-btn" id="word-next-btn" onclick="step()">NEXT RESONANCE</button>
+            </div>
+
+            <div id="view-solution" class="hidden">
+                <h1 class="title-gold" style="font-size:1.1rem;">STRATEGI PRESTIGE</h1>
+                <div class="sol-scroll" id="sol-target"></div>
+                <button class="action-btn" onclick="location.reload()">REBOOT SYSTEM</button>
+            </div>
+
+            <div id="view-sial" class="hidden">
+                <h1 class="title-gold">DESTRUCTION ZONE</h1>
+                <p style="font-size:0.7rem; color:#666; margin-bottom:20px;">Tuliskan beban atau kesialan lu, lalu hancurkan berkeping-keping.</p>
+                <div class="sial-zone">
+                    <input type="text" id="sial-field" class="sial-input" placeholder="Apa sial lu?" oninput="syncSial()">
+                    <div id="sial-ghost"></div>
+                    <button class="action-btn" style="width:100%" onclick="obliterate()">OBLITERATE!</button>
+                    <button class="btn-prestige" style="margin-top:20px; border:none;" onclick="location.reload()">CANCEL</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="game-panel">
+            <div style="padding: 20px; text-align: center;">
+                <h2 class="title-gold" style="font-size:0.8rem; margin-bottom: 5px;">ZEN PARTICLE ENGINE</h2>
+                <p style="font-size:0.55rem; color:#444; letter-spacing:1px;">TOUCH TO INTERACT WITH GOLDEN ENERGY</p>
+            </div>
+            <canvas id="zen-canvas"></canvas>
+        </div>
+
+    </div>
+<script>
+    /* IKIY PRESTIGE - LOGIC ENGINE v3.0
+       Designed for maximum interaction and heavy-duty scripting.
+    */
+
+    const PRESTIGE_DB = {
+        kerja: [
+            "Pekerjaan lu itu maraton panjang, jangan paksa diri buat lari sprint setiap hari.",
+            "Inget, bos lu bisa dapet pengganti lu besok, tapi keluarga lu gak bakal pernah bisa.",
+            "Profesionalitas sejati adalah tahu kapan harus berhenti dan mulai mencintai diri sendiri.",
+            "Dunia gak bakal kiamat karena satu tugas telat, tapi hidup lu bisa hancur karena stres.",
+            "Lu itu manusia yang punya limit, bukan robot yang diprogram buat kerja tanpa henti.",
+            "Jangan biarin mimpi-mimpi besar lu terkubur cuma karena tumpukan laporan di meja kantor.",
+            "Gak ada nominal gaji yang cukup buat bayar kesehatan mental lu yang berantakan.",
+            "Tarik napas dalam. Lu udah berjuang sejauh ini, lu hebat, lu layak buat istirahat.",
+            "Malam ini lu bebas. Lepasin semua beban kantor di pintu depan, jangan bawa ke kamar.",
+            "Jangan bandingin kecepatan sukses lu sama orang lain. Fokus ke jalur lu sendiri.",
+            "Target emang penting, tapi bahagia itu target yang paling sakral buat dicapai.",
+            "Kesalahan hari ini itu pupuk buat kesuksesan besok. Jangan diratapi, pelajari aja.",
+            "Rejeki lu udah tertulis di langit, gak bakal bisa direbut cuma lewat drama kantor.",
+            "Istirahat sejenak bukan berarti lu kalah, itu strategi biar lu menang lebih besar nanti.",
+            "Fokus ke hal yang bisa lu kendaliin. Yang di luar itu? Biarin semesta yang urus.",
+            "Lu adalah aset paling berharga di dunia ini. Jangan disia-siakan buat hal yang toxic.",
+            "Setiap tantangan itu cara Tuhan buat bikin lu jadi versi yang lebih Prestige.",
+            "Suasana kantor boleh berisik, tapi hati lu harus tetep jadi danau yang tenang.",
+            "Jangan biarin orang lain nentuin harga diri lu cuma dari hasil kerjaan lu hari itu.",
+            "Lu tangguh. Lu berani. Besok kita hajar lagi, tapi sekarang, waktunya tenang."
+        ],
+        sekolah: [
+            "Nilai di kertas itu cuma angka, tapi mental pejuang lu itu yang bakal bawa lu sukses.",
+            "Sekolah emang berat, tapi ini adalah proses lu buat 'ngebeli' masa depan yang mewah.",
+            "Lu gak lagi balapan sama ranking satu di kelas. Lu lagi balapan sama rasa males lu sendiri.",
+            "Pusing pas belajar itu tanda saraf otak lu lagi berkembang. Nikmatin proses pinter itu.",
+            "Jangan takut buat salah. Sekolah itu laboratorium hidup, tempat lu eksperimen dan gagal.",
+            "Tugas numpuk? Cicil satu per satu. Lu jauh lebih besar dari sekadar tumpukan tugas.",
+            "Mimpi lu terlalu mahal buat dikalahin cuma sama soal matematika yang sulit.",
+            "Setiap jam belajar lu itu tabungan emas buat masa depan yang lebih Prestige.",
+            "Jangan bandingin diri lu. Setiap bunga punya musim mekar yang berbeda, begitu juga lu.",
+            "Guru mungkin galak, tapi hidup bakal lebih galak kalo lu gak punya bekal ilmu.",
+            "Capek nulis? Letakkan penanya. Lu itu manusia, bukan mesin cetak otomatis.",
+            "Ngantuk pas baca itu manusiawi. Basuh muka, denger musik, lalu hajar lagi pelan-pelan.",
+            "Masa depan lu cerah banget, makanya butuh perjuangan yang ekstra keras sekarang.",
+            "Satu nilai jelek gak nentuin masa depan lu. Lu punya bakat terpendam yang lebih hebat.",
+            "Tarik napas. Fokus. Satu langkah lagi dan tugas ini bakal kelar dengan sempurna.",
+            "Dunia butuh orang-orang tangguh kayak lu. Belajar itu cuma latihan buat mental lu.",
+            "Jangan stres berlebihan. Masa muda lu itu harta, imbangi belajar dengan kebahagiaan.",
+            "Orang hebat gak berenti pas mereka capek, mereka berenti pas mereka udah sampe tujuan.",
+            "Bayangin bangganya lu pas lulus nanti. Semua capek ini bakal terbayar lunas, fix!",
+            "Lu pasti bisa. Ikiy percaya penuh sama potensi besar yang ada di dalem diri lu."
+        ],
+        mental: [
+            "Nggak apa-apa banget kalo hari ini lu cuma sanggup buat bertahan hidup. Itu prestasi!",
+            "Langit gak selamanya biru cerah, dan itu normal. Perasaan lu yang mendung juga wajar.",
+            "Lu itu manusia, punya batas. Jangan paksa diri jadi mesin produktivitas 24 jam.",
+            "Burnout itu sinyal kalo lu udah terlalu lama peduli sama hal yang salah. Balik ke diri lu.",
+            "Jangan pernah bandingin Bab 1 hidup lu sama Bab 50 hidup orang lain. Beda skenario.",
+            "Stres itu alarm tubuh kalo lu butuh jeda. Jangan diabaikan ampe mesin mental lu lag.",
+            "Lu berharga bukan karena apa yang lu hasilkan, tapi karena keberadaan lu di dunia ini.",
+            "Dunia emang berisik, makanya lu butuh keheningan ini buat nemuin diri lu lagi.",
+            "Ngerasa kosong itu awal dari proses pengisian hal-hal baru yang lebih baik.",
+            "Cintai diri lu dulu sebelum kasih cinta ke orang lain. Lu adalah prioritas utama.",
+            "Menangis itu bukan tanda lemah, itu cara hati lu buat nge-reset beban emosi.",
+            "Lu gak sendirian. Banyak jiwa hebat lagi berjuang di frekuensi yang sama kayak lu.",
+            "Masa lalu lu udah selesai. Hari ini adalah kanvas kosong buat lu lukis ulang.",
+            "Ketenangan itu kemewahan paling tinggi, dan malam ini lu dapet akses eksklusifnya.",
+            "Kalo dunia jahat sama lu, pastikan lu tetep lembut dan baik sama diri lu sendiri.",
+            "Lu kuat. Lebih kuat dari badai pikiran apa pun yang lagi nerjang lu sekarang.",
+            "Istirahat itu strategi, bukan menyerah. Lu butuh energi buat ronde kemenangan nanti.",
+            "Semua bakal baik-baik aja. Gak harus sekarang, tapi pasti bakal sampe ke titik itu.",
+            "Tutup mata lu. Lu itu cahaya di tengah kegelapan lu sendiri. Nyalain lagi power-nya!",
+            "Tarik napas dalam, buang semua racun. Lu layak bahagia tanpa syarat apa pun."
+        ],
+        solusi: [
+            {t: "ULTIMATE BRAIN DUMP", d: "Tulis semua kekacauan pikiran di kertas. Pindahkan beban dari otak ke media fisik."},
+            {t: "THE 5-MINUTE RULE", d: "Paksa diri gerak cuma 5 menit. Momentum itu bakal narik lu buat lanjut tanpa paksaan."},
+            {t: "SENSORI RESET", d: "Matikan semua lampu, diam tanpa gadget 15 menit. Biarkan otak melakukan reboot alami."},
+            {t: "SLEEP AUDIT", d: "Pastikan tidur 8 jam berkualitas. Fisik yang loyo adalah akar dari mental yang rapuh."},
+            {t: "SOCIAL MEDIA DETOX", d: "Hapus atau mute akun yang bikin lu ngerasa kurang. Bersihkan asupan visual lu."},
+            {t: "BOX BREATHING", d: "Tarik 4s, tahan 4s, buang 4s, tahan 4s. Ini teknik komando buat tenangin saraf."},
+            {t: "DEEP HYDRATION", d: "Minum air putih minimal 3 liter. Otak yang dehidrasi bikin emosi jadi labil parah."},
+            {t: "SUNLIGHT EXPOSURE", d: "Cari matahari pagi. Vitamin D adalah bahan bakar alami untuk hormon kebahagiaan lu."},
+            {t: "PRESTIGE AFFIRMATION", d: "Ucapkan 'Gue Berharga' di depan cermin. Bangun ulang kepercayaan diri dari dalam."},
+            {t: "WORK-LIFE BARRIER", d: "Tentukan jam selesai yang mutlak. Jangan pernah sentuh urusan kerja di jam istirahat."},
+            {t: "NATURE WALK", d: "Jalan kaki di taman tanpa musik. Biarkan suara alam menyembuhkan frekuensi otak lu."},
+            {t: "NOSTALGIA THERAPY", d: "Mainkan game atau hobi masa kecil. Reconnect dengan diri lu yang dulu ceria."},
+            {t: "RADICAL SELF-PARDON", d: "Maafkan kesalahan hari ini. Besok adalah kesempatan baru, bukan hukuman baru."},
+            {t: "GLUCOSE CONTROL", d: "Kurangi gula berlebih. Sugar crash bikin mood swing lu makin gak terkendali."},
+            {t: "MINIMALIST SPACE", d: "Rapikan meja atau kamar. Ruangan yang bersih bikin pikiran lu gak berantakan."},
+            {t: "ZEN FREQUENCY", d: "Dengarkan audio 432Hz. Ini frekuensi alam yang bisa sinkronkan gelombang otak."},
+            {t: "QUALITY DIALOGUE", d: "Bicara dengan satu orang terpercaya. Mengeluarkan beban lewat suara itu melegakan."},
+            {t: "GRATITUDE JOURNAL", d: "Sebutkan 3 hal kecil yang oke hari ini. Masih bisa napas itu udah kemewahan."},
+            {t: "DARK MODE ONLY", d: "Gunakan mode gelap di semua device malam hari buat jaga kualitas melatonin lu."},
+            {t: "SOLITUDE SESSION", d: "Berikan waktu buat sendiri total. Re-charge energi lu tanpa interupsi dunia luar."}
+        ]
+    };
+
+    let curCat = ''; let curIdx = 0;
+
+    // --- NAVIGATION ENGINE ---
+    function nav(id) {
+        const panels = document.querySelectorAll('.panel > div');
+        panels.forEach(p => p.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function launch(cat) {
+        curCat = cat; curIdx = 0;
+        nav('view-words');
+        step();
+    }
+
+    function step() {
+        const list = PRESTIGE_DB[curCat];
+        if(curIdx < list.length) {
+            render(list[curIdx]);
+            curIdx++;
+            if(curIdx === list.length) document.getElementById('word-next-btn').innerText = "VIEW SOLUTIONS";
+        } else {
+            showSolution();
+        }
+    }
+
+    function render(txt) {
+        const target = document.getElementById('word-target');
+        target.innerHTML = '';
+        txt.split(' ').forEach((w, i) => {
+            const s = document.createElement('span');
+            s.innerText = w; s.className = 'word-unit';
+            s.style.animationDelay = `${i * 0.05}s`;
+            target.appendChild(s);
+        });
+    }
+
+    function showSolution() {
+        nav('view-solution');
+        const target = document.getElementById('sol-target');
+        target.innerHTML = '';
+        PRESTIGE_DB.solusi.forEach((s, i) => {
+            setTimeout(() => {
+                const c = document.createElement('div');
+                c.className = 'card-sol word-unit';
+                c.innerHTML = `<b>${s.t}</b><p style="margin-top:10px; color:#888;">${s.d}</p>`;
+                target.appendChild(c);
+            }, i * 120);
+        });
+    }
+
+    // --- BUANG SIAL ENGINE (OBLITERATION) ---
+    function syncSial() {
+        document.getElementById('sial-ghost').innerText = document.getElementById('sial-field').value;
+    }
+
+    function obliterate() {
+        const ghost = document.getElementById('sial-ghost');
+        if(!ghost.innerText) return alert("Nothing to destroy, Bro!");
+        
+        ghost.style.transform = "scale(3) rotate(20deg)";
+        ghost.style.filter = "blur(30px)";
+        ghost.style.opacity = "0";
+
+        for(let i=0; i<80; i++) spawnP(window.innerWidth/2, window.innerHeight/2);
+
+        setTimeout(() => {
+            alert("DESTRUCTION COMPLETE. YOUR BURDEN IS GONE!");
+            location.reload();
+        }, 1200);
+    }
+
+    function spawnP(x, y) {
+        const p = document.createElement('div');
+        p.style.position = 'fixed'; p.style.left = x+'px'; p.style.top = y+'px';
+        p.style.width = '12px'; p.style.height = '12px'; p.style.background = 'gold';
+        p.style.borderRadius = '50%'; p.style.zIndex = '9999'; p.style.boxShadow = '0 0 15px gold';
+        document.body.appendChild(p);
+        const a = Math.random()*Math.PI*2; const v = Math.random()*20+10;
+        let vx = Math.cos(a)*v; let vy = Math.sin(a)*v; let op = 1;
+        function m() {
+            p.style.left = (parseFloat(p.style.left)+vx)+'px'; p.style.top = (parseFloat(p.style.top)+vy)+'px';
+            op-=0.02; p.style.opacity = op; if(op>0) requestAnimationFrame(m); else p.remove();
+        }
+        m();
+    }
+
+    // --- ZEN PARTICLE ENGINE ---
+    const zC = document.getElementById('zen-canvas'); const zX = zC.getContext('2d');
+    let zp = []; let mouse = {x:null, y:null};
+
+    function initZen() {
+        zC.width = zC.parentElement.clientWidth; zC.height = 300;
+        zp = []; for(let i=0; i<120; i++) zp.push({
+            x:Math.random()*zC.width, y:Math.random()*zC.height, 
+            vx:(Math.random()-0.5)*2, vy:(Math.random()-0.5)*2, r:Math.random()*2.5+1
+        });
+    }
+
+    function runZen() {
+        zX.clearRect(0,0,zC.width,zC.height);
+        zp.forEach(p => {
+            p.x+=p.vx; p.y+=p.vy;
+            if(p.x<0||p.x>zC.width) p.vx*=-1; if(p.y<0||p.y>zC.height) p.vy*=-1;
+            if(mouse.x) {
+                let dx = mouse.x - p.x; let dy = mouse.y - p.y;
+                let d = Math.sqrt(dx*dx + dy*dy);
+                if(d < 100) { p.x -= dx*0.04; p.y -= dy*0.04; }
+            }
+            zX.fillStyle = "rgba(191,149,63,0.9)"; zX.beginPath(); zX.arc(p.x,p.y,p.r,0,Math.PI*2); zX.fill();
+        });
+        requestAnimationFrame(runZen);
+    }
+
+    zC.addEventListener('mousemove', e => { const r = zC.getBoundingClientRect(); mouse.x = e.clientX-r.left; mouse.y = e.clientY-r.top; });
+    zC.addEventListener('mouseleave', () => mouse.x = null);
+    zC.addEventListener('touchstart', e => { const r = zC.getBoundingClientRect(); mouse.x = e.touches[0].clientX-r.left; mouse.y = e.touches[0].clientY-r.top; });
+    zC.addEventListener('touchend', () => mouse.x = null);
+
+    // --- GLOBAL BG ---
+    const bC = document.getElementById('bg-canvas'); const bX = bC.getContext('2d');
+    bC.width = window.innerWidth; bC.height = window.innerHeight;
+    let bpts = []; for(let i=0; i<50; i++) bpts.push({x:Math.random()*bC.width, y:Math.random()*bC.height, vx:(Math.random()-0.5)*0.6, vy:(Math.random()-0.5)*0.6});
+    function drawB() {
+        bX.clearRect(0,0,bC.width,bC.height); bX.strokeStyle = "rgba(191,149,63,0.2)";
+        bpts.forEach(a => {
+            a.x+=a.vx; a.y+=a.vy; if(a.x<0||a.x>bC.width) a.vx*=-1; if(a.y<0||a.y>bC.height) a.vy*=-1;
+            bpts.forEach(b => { let d = Math.hypot(a.x-b.x, a.y-b.y); if(d<180) { bX.beginPath(); bX.moveTo(a.x,a.y); bX.lineTo(b.x,b.y); bX.stroke(); } });
+        });
+        requestAnimationFrame(drawB);
+    }
+
+    window.onload = () => { initZen(); runZen(); drawB(); };
+    window.onresize = () => { bC.width = window.innerWidth; bC.height = window.innerHeight; initZen(); };
+</script>
+</body>
+</html>
